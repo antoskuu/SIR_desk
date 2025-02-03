@@ -1,0 +1,13 @@
+{
+  "name": "bundle-generator-cli",
+  "version": "1.0.0",
+  "description": "CLI tool for generating JavaScript bundles",
+  "main": "bundleGenerator.js",
+  "bin": {
+    "bundle-cli": "./bundleCLI.js"
+  },
+  "engines": {
+  },
+  "dependencies": {
+  }
+}
