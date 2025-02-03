@@ -3,7 +3,7 @@
 ## 📌 Description
 Ce projet permet une gestion transparente des dépendances pour un utilisateur de Desk. Les dépendances sont d'abord spécifiées dans un fichier dédié, puis un bundle est généré automatiquement. L'utilisateur peut ainsi intégrer et utiliser facilement les dépendances nécessaires sans se soucier de leur gestion.
 
-## Présentation des dossiers
+## 📁 Présentation des répertoires
 
 - **/bundleGenerator/** : Dossier contenant le générateur de bundles fonctionnel. Ce générateur ne prend pas en charge les imports depuis GitHub.
 
