@@ -15,7 +15,8 @@ loader.load(desk.FileSystem.getFileURL('data/stent.nrrd'), function (volume) {
         
         
     cmtextures = {
-            viridis: new THREE.TextureLoader().load(desk.FileSystem.getFileURL('data/cm_viridis.png'), viewer.render())
+            viridis: new THREE.TextureLoader().load(desk.FileSystem.getFileURL('data/cm_viridis.png'), viewer.render()),
+            gray: new THREE.TextureLoader().load(desk.FileSystem.getFileURL('data/cm_gray.png'), viewer.render())
         };
     const shader = VolumeRenderShader1;
 
@@ -41,6 +42,7 @@ loader.load(desk.FileSystem.getFileURL('data/stent.nrrd'), function (volume) {
 
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
+
     viewer.viewAll();
 
     viewer.render();
@@ -110,19 +112,18 @@ var win2 = new qx.ui.window.Window("THREE Window");
       win.add(selectLabel);
       
       var selectBox = new qx.ui.form.SelectBox();
-      var item1 = new qx.ui.form.ListItem("Option 1");
-      var item2 = new qx.ui.form.ListItem("Option 2");
-      var item3 = new qx.ui.form.ListItem("Option 3");
-      
+      var item1 = new qx.ui.form.ListItem("Viridis");
+      var item2 = new qx.ui.form.ListItem("Gray");
+
       selectBox.add(item1);
       selectBox.add(item2);
-      selectBox.add(item3);
-      
+
       win.add(selectBox);
       
       selectBox.addListener("changeSelection", function(e) {
         var selectedItem1 = e.getData()[0];
-        volconfig.renderstyle = e.getData;
+        
+        volconfig.colormap = selectedItem1.getLabel().toLowerCase(); // "viridis" ou "gray"
         updateUniforms();
         console.log("Selected: " + selectedItem1.getLabel());
       });
