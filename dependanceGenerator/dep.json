@@ -1,0 +1,20 @@
+{
+    "imports": [
+      {
+        "type": "default",
+        "name": "lodash",
+        "path": "lodash"
+      },
+      {
+        "type": "namespace",
+        "name": "dayjs",
+        "path": "github.com/iamkun/dayjs"
+      },
+      {
+        "type": "named",
+        "names": ["map", "filter"],
+        "path": "lodash"
+      }
+    ]
+  }
+  
