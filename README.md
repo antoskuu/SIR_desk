@@ -7,9 +7,6 @@
 3. [💻 Utilisation](#-utilisation)  
    1. [Cloner le dépôt](#cloner-le-dépôt)  
    2. [Génération de bundle](#génération-de-bundle)  
-      - [Création du dossier et ajout des fichiers](#création-du-dossier-et-ajout-des-fichiers)  
-      - [Modification du fichier index.js](#modification-du-fichier-indexjs)  
-      - [Lancer le terminal et générer le bundle](#lancer-le-terminal-et-générer-le-bundle)  
    3. [Générer les imports depuis un JSON](#générer-les-imports-depuis-un-json)  
 
 ## 📌 Description
