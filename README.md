@@ -1,4 +1,5 @@
 # Génération de bundle sur Desk
+Partie réalisée par Thomas RAYNAUD
 
 ## 📖 Sommaire  
 
