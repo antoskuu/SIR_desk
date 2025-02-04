@@ -1,5 +1,5 @@
 # Volume Rendering sur Desk
-
+Partie réalisée par Antonin GUY.
 ## 📌 Description
 
 Ce projet implémente un rendu volumique en utilisant THREE.js et Qooxdoo sur Desk. Il permet de charger un fichier NRRD, d'afficher le volume en 3D et d'ajuster ses paramètres via une interface utilisateur.
