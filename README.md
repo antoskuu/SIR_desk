@@ -26,7 +26,7 @@ Ce projet permet une gestion transparente des dépendances pour un utilisateur d
 
 ## 💻 Utilisation
 
-### Cloner le dépot
+### Cloner le dépôt
 
 ``` bash
 git clone https://github.com/antoskuu/SIR_desk.git
