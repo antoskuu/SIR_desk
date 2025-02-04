@@ -6,8 +6,8 @@ Ce projet implémente un rendu volumique en utilisant THREE.js et Qooxdoo sur De
 
 ## 🚀 Mise en route
 ### 🧷Installation des dépendances webpack (NRRDLoader et VolumeRenderShader1)
-1. Cloner le dépot
-```
+1. Cloner le dépôt
+``` bash
 git clone https://github.com/antoskuu/SIR_desk.git
 ```
 2. Créer un dossier *bundlegenerator* dans le dossier *Code* de Desk et y glisser tous les fichiers du dossier cloné SIR_Desk/installation_dependances :
@@ -19,11 +19,11 @@ git clone https://github.com/antoskuu/SIR_desk.git
 ![image](https://github.com/user-attachments/assets/67d43cca-aa32-4118-b902-eb4fc89ddcf0)
 
 4. Aller dans le dossier BundleGenerator
-```
+``` bash
 cd desk/code/bundlegenerator
 ```
 Lancer la création du bundle
-```
+``` bash
 node bundleCLI.js index.js
 ```
 ![image](https://github.com/user-attachments/assets/ac846a5e-d47e-42b8-a7dd-920a55ee31bb)
