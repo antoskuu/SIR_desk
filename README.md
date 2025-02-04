@@ -13,3 +13,16 @@ Ce projet permet une gestion transparente des dépendances pour un utilisateur d
 
 
 ## 💻 Utilisation
+
+1. Cloner le dépot
+
+```
+git clone https://github.com/antoskuu/SIR_desk.git
+```
+
+3. 
+
+### Génération de bundle
+
+### Générer les imports depuis un JSON
+
