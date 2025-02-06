@@ -32,7 +32,7 @@ async function main() {
         const sourceCode = fs.readFileSync(sourcePath, 'utf-8'); 
 
         // Crée un répertoire temporaire pour la génération du bundle
-        const tempDir = path.resolve(__dirname, 'temp');
+        const tempDir = './';
         const generator = new BundleGenerator(tempDir); // Crée une instance de BundleGenerator
 
         console.log('Génération du bundle en cours...');
