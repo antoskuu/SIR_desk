@@ -1,120 +1,128 @@
-/*
-La classe principale qui gère toute la logique de traitement :
-    - Détection des dépendances
-    - Installation des packages NPM
-    - Génération de la configuration webpack
-    - Création du bundle
-*/
-
-const fs = require('fs'); 
+const fs = require('fs');
 const path = require('path');
-const util = require('util'); 
+const util = require('util');
 const { exec } = require('child_process');
 const execPromise = util.promisify(exec);
 
 class BundleGenerator {
-    constructor(tempDir) { // tempDir > chemin du répertoire temporaire
-        this.TEMP_DIR = tempDir; // Sauvegarde du répertoire temporaire
-        this.initTempDirectory(); // Initialise le répertoire temporaire
+    constructor(tempDir) {
+        // S'assure que le chemin est relatif au répertoire courant
+        this.TEMP_DIR = path.join(process.cwd(), tempDir);
     }
 
-    // Crée un répertoire temporaire, en supprimant s'il existe déjà
-    initTempDirectory() {
-        if (fs.existsSync(this.TEMP_DIR)) {
-            fs.rmSync(this.TEMP_DIR, { recursive: true, force: true }); // Supprime le répertoire existant
-        }
-        fs.mkdirSync(this.TEMP_DIR, { recursive: true }); // Crée un nouveau répertoire
-    }
-
-    // Trouve toutes les dépendances dans le code source (via des expressions régulières)
     findDependencies(sourceCode) {
         const patterns = [
-            /require\s*\(\s*['"]([^'"]+)['"]\s*\)/g, // Regex pour require()
-            /import\s+(?:[\w*\s{},]*)\s+from\s+['"]([^'"]+)['"]/g, // Regex pour import ... from
-            /import\s+['"]([^'"]+)['"]/g // Regex pour import ...
+            /require\s*\(\s*['"]([^'"]+)['"]\s*\)/g,
+            /import\s+(?:[\w*\s{},]*)\s+from\s+['"]([^'"]+)['"]/g,
+            /import\s+['"]([^'"]+)['"]/g
         ];
         
-        const dependencies = new Set(); // Utilisation d'un Set pour éviter les doublons
+        const dependencies = new Set();
 
-        // Applique chaque pattern pour extraire les dépendances
         patterns.forEach(pattern => {
             let match;
             while ((match = pattern.exec(sourceCode)) !== null) {
                 const dependency = match[1];
-                if (!dependency.startsWith('.') && !dependency.startsWith('/')) { // Ignore les chemins relatifs
-                    const mainPackage = dependency.split('/')[0]; // Extrait le nom du package
+                if (!dependency.startsWith('.') && !dependency.startsWith('/')) {
+                    const mainPackage = dependency.split('/')[0];
                     dependencies.add(mainPackage);
                 }
             }
         });
         
-        return Array.from(dependencies); // Retourne un tableau des dépendances uniques
+        return Array.from(dependencies);
     }
 
-    // Génère le fichier de configuration Webpack pour le bundle
     generateWebpackConfig(folderPath) {
         const webpackConfig = `
+const path = require('path');
 
-            const path = require('path');
-
-            module.exports = {
-                mode: 'development',            // ATTENTION : Mode développement pour éviter le threeshaking
-                entry: './src/index.js',        // Votre fichier source
-                output: {
-                    path: path.resolve(__dirname, 'dist'),
-                    filename: 'bundle.js',
-                },
-                optimization: {
-                    minimize: false,            // Facilite le debugage car fichier non minifié
-                    concatenateModules: false,  // Désactive la fusion des modules
-                    sideEffects: false          // évite que Webpack supprime du code supposé inutile
-                },
-                module: {
-                    rules: [
-                    {
-                        test: /\.js$/,
-                        exclude: /node_modules/,
-                        use: {
-                            loader: 'babel-loader' // Utilise Babel pour la compatibilité avec les anciens navigateurs
-                        }
-                    }
-                    ]
-                }
-            };
-        `;
-        // Écrit la configuration dans un fichier
-        fs.writeFileSync(path.join(folderPath, 'webpack.config.js'), webpackConfig);
+module.exports = {
+    mode: 'development',
+    entry: './src/index.js',
+    output: {
+        path: path.resolve(__dirname, 'dist'),
+        filename: 'bundle.js',
+    },
+    optimization: {
+        minimize: false,
+        concatenateModules: false,
+        sideEffects: false
+    },
+    module: {
+        rules: [
+        {
+            test: /\.js$/,
+            exclude: /node_modules/,
+            use: {
+                loader: 'babel-loader'
+            }
+        }
+        ]
+    }
+};`;
+        fs.writeFileSync(path.join(folderPath, 'webpack.config.js'), webpackConfig.trim());
     }
 
-    // Génère le bundle en installant les dépendances et en exécutant Webpack
     async generateBundle(sourceCode) {
         try {
-            const folder = 'bundle'; // Crée un nom unique pour le dossier
-            const folderPath = path.join(this.TEMP_DIR, folder); // Chemin du dossier temporaire
+            // Crée un sous-dossier 'bundle' dans le dossier temporaire
+            const folderPath = path.join(this.TEMP_DIR, 'bundle');
             const srcPath = path.join(folderPath, 'src');
             const distPath = path.join(folderPath, 'dist');
 
-            // Crée les répertoires nécessaires
+            // Crée la structure de dossiers
+            fs.mkdirSync(folderPath, { recursive: true });
             fs.mkdirSync(srcPath, { recursive: true });
             fs.mkdirSync(distPath, { recursive: true });
-            // Écrit le code source dans le dossier 'src'
+
+            // Initialise un package.json vide
+            const packageJson = {
+                name: "temp-bundle",
+                version: "1.0.0",
+                private: true
+            };
+            fs.writeFileSync(
+                path.join(folderPath, 'package.json'),
+                JSON.stringify(packageJson, null, 2)
+            );
+
+            // Écrit le code source
             fs.writeFileSync(path.join(srcPath, 'index.js'), sourceCode);
 
-            // Trouve et installe les dépendances nécessaires
+            // Installe les dépendances
             const dependencies = this.findDependencies(sourceCode);
             if (dependencies.length > 0) {
                 console.log('Dépendances trouvées:', dependencies);
-                const installCommand = `npm install ${dependencies.join(' ')}`;
+                // Ajoute webpack et babel en tant que devDependencies
+                const devDependencies = [
+                    'webpack',
+                    'webpack-cli',
+                    '@babel/core',
+                    '@babel/preset-env',
+                    'babel-loader'
+                ];
+                
+                const installCommand = `npm install ${dependencies.join(' ')} && npm install -D ${devDependencies.join(' ')}`;
                 console.log(`Exécution de : ${installCommand}`);
-                await execPromise(installCommand, { cwd: folderPath }); // Exécute l'installation des dépendances
+                await execPromise(installCommand, { cwd: folderPath });
             }
 
+            // Crée le fichier de configuration Babel
+            const babelConfig = {
+                "presets": ["@babel/preset-env"]
+            };
+            fs.writeFileSync(
+                path.join(folderPath, '.babelrc'),
+                JSON.stringify(babelConfig, null, 2)
+            );
+            
             // Génère la configuration Webpack
             this.generateWebpackConfig(folderPath);
-            // Exécute Webpack pour générer le bundle
+            
+            // Exécute Webpack
             await execPromise('npx webpack', { cwd: folderPath });
 
-            // Retourne le chemin du bundle généré
             return {
                 bundlePath: path.join(distPath, 'bundle.js'),
                 folderPath
@@ -125,4 +133,4 @@ class BundleGenerator {
     }
 }
 
-module.exports = BundleGenerator; // Exporte la classe pour l'utiliser dans d'autres fichiers
+module.exports = BundleGenerator;
